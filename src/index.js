@@ -5,6 +5,7 @@ import {expressHelpers, run} from 'yacol'
 import logger from 'winston'
 import {URL} from 'url'
 import _request from 'request-promise'
+import _ from 'lodash'
 
 const request = _request.defaults({
   headers: {Authorization: `Basic ${c.jiraAuthorization}`},
@@ -26,15 +27,26 @@ function* vacations(req, res) {
     const url = new URL(c.jiraUrl)
     url.pathname = tempoPath
     url.searchParams.append('teamId', '4')
-    url.searchParams.append('dateFrom', '2017-10-01')
-    url.searchParams.append('dateTo', '2017-12-31')
-    const result = await request(url.toString())
-    res.status(200).send(result)
+    url.searchParams.append('dateFrom', `${req.params.year}-01-01`)
+    url.searchParams.append('dateTo', `${req.params.year}-12-31`)
+
+    const result = JSON.parse(await request(url.toString()))
+      .map((worklog) => [
+        ['timeSpentSeconds'],
+        ['dateStarted', (s) => s.substr(0, 10)],
+        ['author.name'],
+        ['issue.key'],
+        ['issue.key', (k) => !k.startsWith('VACA')],
+        ['issue.key', (k) => k === 'VACA-3'],
+      ].map(([path, f=_.identity]) => f(_.get(worklog, path)))
+      )
+
+    res.status(200).send(JSON.stringify(result))
   })()
 }
 
 const r = {
-  vacations: '/vacations',
+  vacations: '/vacations/:year',
 }
 
 register(app, 'get', r.vacations, vacations)
