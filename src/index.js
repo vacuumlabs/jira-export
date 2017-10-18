@@ -32,12 +32,10 @@ function* vacations(req, res) {
 
     const result = JSON.parse(await request(url.toString()))
       .map((worklog) => [
-        ['timeSpentSeconds'],
         ['dateStarted', (s) => s.substr(0, 10)],
         ['author.name'],
-        ['issue.key'],
-        ['issue.key', (k) => !k.startsWith('VACA')],
-        ['issue.key', (k) => k === 'VACA-3'],
+        ['issue.key', (k) => (!k.startsWith('VACA')) * worklog.timeSpentSeconds / 3600],
+        ['issue.key', (k) => (k === 'VACA-3') * worklog.timeSpentSeconds / 3600],
       ].map(([path, f=_.identity]) => f(_.get(worklog, path)))
       )
 
