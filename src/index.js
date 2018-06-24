@@ -8,7 +8,7 @@ import _request from 'request-promise'
 import _ from 'lodash'
 
 const request = _request.defaults({
-  headers: {Authorization: `Basic ${c.jiraAuthorization}`},
+  headers: {Authorization: `Bearer ${c.jiraAuthorization}`},
 })
 
 logger.cli()
@@ -23,7 +23,7 @@ const {register, runApp} = expressHelpers
 
 function* vacations(req, res) {
   yield (async function() {
-    const tempoPath = 'rest/tempo-timesheets/3/worklogs/'
+    const tempoPath = 'rest-legacy/tempo-timesheets/3/worklogs/'
     const url = new URL(c.jiraUrl)
     url.pathname = tempoPath
     url.searchParams.append('teamId', '4')
@@ -45,7 +45,7 @@ function* vacations(req, res) {
 
 function* payroll(req, res) {
   yield (async function() {
-    const tempoPath = 'rest/tempo-timesheets/3/worklogs/'
+    const tempoPath = 'rest-legacy/tempo-timesheets/3/worklogs/'
     const url = new URL(c.jiraUrl)
     const year = parseInt(req.params.year)
     const month = parseInt(req.params.month) - 1
