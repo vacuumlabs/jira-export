@@ -8,7 +8,7 @@ import _request from 'request-promise'
 import _ from 'lodash'
 
 const request = _request.defaults({
-  headers: {Authorization: `Basic ${c.jiraAuthorization}`},
+  headers: {Authorization: `Bearer ${c.jiraAuthorization}`},
 })
 
 logger.cli()
@@ -23,7 +23,7 @@ const {register, runApp} = expressHelpers
 
 function* vacations(req, res) {
   yield (async function() {
-    const tempoPath = 'rest/tempo-timesheets/3/worklogs/'
+    const tempoPath = 'rest-legacy/tempo-timesheets/3/worklogs/'
     const url = new URL(c.jiraUrl)
     url.pathname = tempoPath
     url.searchParams.append('teamId', '4')
@@ -36,7 +36,7 @@ function* vacations(req, res) {
         ['author.name'],
         ['issue.key', (k) => (!k.startsWith('VACA')) * worklog.timeSpentSeconds / 3600],
         ['issue.key', (k) => (k === 'VACA-3') * worklog.timeSpentSeconds / 3600],
-      ].map(([path, f=_.identity]) => f(_.get(worklog, path)))
+      ].map(([path, f = _.identity]) => f(_.get(worklog, path)))
       )
 
     res.status(200).send(JSON.stringify(result))
@@ -45,17 +45,17 @@ function* vacations(req, res) {
 
 function* payroll(req, res) {
   yield (async function() {
-    const tempoPath = 'rest/tempo-timesheets/3/worklogs/'
+    const tempoPath = 'rest-legacy/tempo-timesheets/3/worklogs/'
     const url = new URL(c.jiraUrl)
-    const year = parseInt(req.params.year)
-    const month = parseInt(req.params.month) - 1
+    const year = parseInt(req.params.year, 10)
+    const month = parseInt(req.params.month, 10) - 1
 
     function toISO(y, m, d) {
       return (new Date(Date.UTC(y, m, d))).toISOString().substr(0, 10)
     }
 
     const dateFrom = toISO(year, month, 1)
-    const dateTo = toISO(year, month+1, 0)
+    const dateTo = toISO(year, month + 1, 0)
     url.pathname = tempoPath
     url.searchParams.append('teamId', '4')
     url.searchParams.append('dateFrom', dateFrom)
@@ -67,7 +67,7 @@ function* payroll(req, res) {
         ['dateStarted', (s) => s.substr(0, 10)],
         ['author.name'],
         ['issue.key', (k) => k.split('-')[0]],
-      ].map(([path, f=_.identity]) => f(_.get(worklog, path)))
+      ].map(([path, f = _.identity]) => f(_.get(worklog, path)))
       )
 
     res.status(200).send(JSON.stringify(result))
