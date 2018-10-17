@@ -66,7 +66,7 @@ function* payroll(req, res) {
         ['timeSpentSeconds', (t) => t / 3600],
         ['dateStarted', (s) => s.substr(0, 10)],
         ['author.name'],
-        ['issue.key', (k) => k.split('-')[0]],
+        ['issue.key', (k) => _.get(req.query, k, k.split('-')[0])],
       ].map(([path, f = _.identity]) => f(_.get(worklog, path)))
       )
 
