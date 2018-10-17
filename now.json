@@ -1,0 +1,16 @@
+{
+    "alias": ["jira.vacuumlabs.com"],
+    "scale": {
+        "bru1": {
+            "min": 1,
+            "max": 1
+        }
+    },
+    "env": {
+        "NODE_ENV":"production",
+        "log_level":"verbose",
+        "PORT": "8000",
+        "jira_authorization": "@jira-export-authorization",
+        "jira_url": "https://api.tempo.io/"
+    }
+}
