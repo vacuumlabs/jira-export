@@ -23,17 +23,16 @@ const {register, runApp} = expressHelpers
 
 function* vacations(req, res) {
   yield (async function() {
-    const tempoPath = 'rest-legacy/tempo-timesheets/3/worklogs/'
+    const tempoPath = 'core/3/worklogs/team/4'
     const url = new URL(c.jiraUrl)
     url.pathname = tempoPath
-    url.searchParams.append('teamId', '4')
-    url.searchParams.append('dateFrom', `${req.params.year}-01-01`)
-    url.searchParams.append('dateTo', `${req.params.year}-12-31`)
+    url.searchParams.append('from', `${req.params.year}-01-01`)
+    url.searchParams.append('to', `${req.params.year}-12-31`)
 
-    const result = JSON.parse(await request(url.toString()))
+    const result = JSON.parse(await request(url.toString())).results
       .map((worklog) => [
-        ['dateStarted', (s) => s.substr(0, 10)],
-        ['author.name'],
+        ['startDate'],
+        ['author.accountId'],
         ['issue.key', (k) => (!k.startsWith('VACA')) * worklog.timeSpentSeconds / 3600],
         ['issue.key', (k) => (k === 'VACA-3') * worklog.timeSpentSeconds / 3600],
       ].map(([path, f = _.identity]) => f(_.get(worklog, path)))
@@ -45,7 +44,7 @@ function* vacations(req, res) {
 
 function* payroll(req, res) {
   yield (async function() {
-    const tempoPath = 'rest-legacy/tempo-timesheets/3/worklogs/'
+    const tempoPath = 'core/3/worklogs/team/4'
     const url = new URL(c.jiraUrl)
     const year = parseInt(req.params.year, 10)
     const month = parseInt(req.params.month, 10) - 1
@@ -57,15 +56,14 @@ function* payroll(req, res) {
     const dateFrom = toISO(year, month, 1)
     const dateTo = toISO(year, month + 1, 0)
     url.pathname = tempoPath
-    url.searchParams.append('teamId', '4')
-    url.searchParams.append('dateFrom', dateFrom)
-    url.searchParams.append('dateTo', dateTo)
+    url.searchParams.append('from', dateFrom)
+    url.searchParams.append('to', dateTo)
 
-    const result = JSON.parse(await request(url.toString()))
+    const result = JSON.parse(await request(url.toString())).results
       .map((worklog) => [
         ['timeSpentSeconds', (t) => t / 3600],
-        ['dateStarted', (s) => s.substr(0, 10)],
-        ['author.name'],
+        ['startDate'],
+        ['author.accountId'],
         ['issue.key', (k) => _.get(req.query, k, k.split('-')[0])],
       ].map(([path, f = _.identity]) => f(_.get(worklog, path)))
       )
