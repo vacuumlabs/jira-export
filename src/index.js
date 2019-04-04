@@ -58,15 +58,23 @@ function* payroll(req, res) {
     url.pathname = tempoPath
     url.searchParams.append('from', dateFrom)
     url.searchParams.append('to', dateTo)
+    url.searchParams.append('limit', 1000)
 
-    const result = JSON.parse(await request(url.toString())).results
-      .map((worklog) => [
-        ['timeSpentSeconds', (t) => t / 3600],
-        ['startDate'],
-        ['author.accountId'],
-        ['issue.key', (k) => _.get(req.query, k, k.split('-')[0])],
-      ].map(([path, f = _.identity]) => f(_.get(worklog, path)))
+    let requestUrl = url.toString()
+    let result = []
+    while (requestUrl) {
+      const response = JSON.parse(await request(requestUrl))
+      result = result.concat(response.results
+        .map((worklog) => [
+          ['timeSpentSeconds', (t) => t / 3600],
+          ['startDate'],
+          ['author.accountId'],
+          ['issue.key', (k) => _.get(req.query, k, k.split('-')[0])],
+        ].map(([path, f = _.identity]) => f(_.get(worklog, path)))
+        )
       )
+      requestUrl = response.metadata.next
+    }
 
     res.status(200).send(JSON.stringify(result))
   })()
