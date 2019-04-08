@@ -28,15 +28,24 @@ function* vacations(req, res) {
     url.pathname = tempoPath
     url.searchParams.append('from', `${req.params.year}-01-01`)
     url.searchParams.append('to', `${req.params.year}-12-31`)
+    url.searchParams.append('limit', 1000)
 
-    const result = JSON.parse(await request(url.toString())).results
-      .map((worklog) => [
-        ['startDate'],
-        ['author.accountId'],
-        ['issue.key', (k) => (!k.startsWith('VACA')) * worklog.timeSpentSeconds / 3600],
-        ['issue.key', (k) => (k === 'VACA-3') * worklog.timeSpentSeconds / 3600],
-      ].map(([path, f = _.identity]) => f(_.get(worklog, path)))
+    let requestUrl = url.toString()
+    let result = []
+
+    while (requestUrl) {
+      const response = JSON.parse(await request(requestUrl))
+      result = result.concat(response.results
+        .map((worklog) => [
+          ['startDate'],
+          ['author.accountId'],
+          ['issue.key', (k) => (!k.startsWith('VACA')) * worklog.timeSpentSeconds / 3600],
+          ['issue.key', (k) => (k === 'VACA-3') * worklog.timeSpentSeconds / 3600],
+        ].map(([path, f = _.identity]) => f(_.get(worklog, path)))
+        )
       )
+      requestUrl = response.metadata.next
+    }
 
     res.status(200).send(JSON.stringify(result))
   })()
