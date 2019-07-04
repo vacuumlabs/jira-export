@@ -4,4 +4,9 @@
   "env": {
     "node": true
   },
+  "settings": {
+    "react": {
+      "version": "latest"
+    }
+  }
 }
