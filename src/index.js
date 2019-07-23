@@ -2,7 +2,7 @@ import c from './config'
 import express from 'express'
 import bodyParser from 'body-parser'
 import {expressHelpers, run} from 'yacol'
-import logger from 'winston'
+import winston from 'winston'
 import {URL} from 'url'
 import _request from 'request-promise'
 import _ from 'lodash'
@@ -11,13 +11,18 @@ const request = _request.defaults({
   headers: {Authorization: `Bearer ${c.jiraAuthorization}`},
 })
 
-logger.cli()
-logger.level = c.logLevel
-logger.setLevels(logger.config.npm.levels)
-
+const logger = winston.createLogger({
+  level: c.logLevel,
+  format: winston.format.simple(),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({filename: 'error.log', level: 'error'}),
+    new winston.transports.File({filename: 'combined.log'}),
+  ],
+})
 
 const app = express()
-app.use(bodyParser.urlencoded())
+app.use(bodyParser.urlencoded({extended: true}))
 
 const {register, runApp} = expressHelpers
 

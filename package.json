@@ -16,26 +16,28 @@
   },
   "devDependencies": {
     "babel-eslint": "^10.0.2",
-    "eslint": "^6.0.1",
+    "eslint": "^6.1.0",
     "eslint-config-vacuumlabs": "^1.8.2",
-    "eslint-plugin-import": "^2.18.0",
-    "eslint-plugin-react": "^7.14.2"
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-react": "^7.14.3"
   },
   "dependencies": {
-    "babel-cli": "^6.24.1",
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/node": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
+    "@babel/plugin-transform-async-to-generator": "^7.5.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.5.0",
     "babel-plugin-syntax-trailing-function-commas": "^6.22.0",
-    "babel-plugin-transform-async-to-module-method": "^6.24.1",
-    "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
     "babel-plugin-transform-export-extensions": "^6.22.0",
-    "babel-plugin-transform-object-rest-spread": "^6.23.0",
-    "body-parser": "^1.17.2",
-    "express": "^4.15.3",
-    "lodash": "^4.17.4",
-    "request": "^2.81.0",
-    "request-promise": "^4.2.1",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "lodash": "^4.17.15",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4",
     "transenv": "^1.0.3",
-    "winston": "^2.3.1",
+    "winston": "^3.2.1",
     "yacol": "^0.8.0"
   }
 }
